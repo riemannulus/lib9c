@@ -3,6 +3,7 @@ namespace Lib9c.Tests
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Security.Cryptography;
     using System.Threading.Tasks;
     using Bencodex.Types;
     using Libplanet;
@@ -12,17 +13,54 @@ namespace Lib9c.Tests
     using Libplanet.Blockchain.Policies;
     using Libplanet.Blocks;
     using Libplanet.Crypto;
+    using Libplanet.RocksDBStore;
     using Libplanet.Store;
     using Libplanet.Tx;
     using Nekoyume.Action;
     using Nekoyume.BlockChain;
     using Nekoyume.Model;
     using Nekoyume.Model.State;
+    using Serilog;
     using Serilog.Core;
     using Xunit;
 
     public class BlockPolicyTest
     {
+        private ILogger _logger;
+
+        public BlockPolicyTest()
+        {
+            _logger = Log.ForContext<BlockPolicyTest>();
+        }
+
+#pragma warning disable MEN002 // Line is too long
+        [Fact]
+        public void Debug()
+        {
+            var store = new RocksDBStore(@"C:\Users\riema\AppData\Local\planetarium\9c-main-testbed");
+            var stateStore = new TrieStateStore(
+                new RocksDBKeyValueStore(@"C:\Users\riema\AppData\Local\planetarium\9c-main-testbed\states"),
+                new RocksDBKeyValueStore(@"C:\Users\riema\AppData\Local\planetarium\9c-main-testbed\state_hashes")
+            );
+            var genesis = store.GetBlock<PolymorphicAction<ActionBase>>(
+                new HashDigest<SHA256>(
+                    ByteUtil.ParseHex("4582250d0da33b06779a8475d283d5dd210c683b9b999d74d03fac4f58fa6bce"))
+            );
+            var bc = new BlockChain<PolymorphicAction<ActionBase>>(
+                new DebugPolicy(),
+                store,
+                stateStore,
+                genesis,
+                new[] { new BlockPolicySource(_logger).LoggedActionRenderer }
+            );
+
+            var fork = bc.Fork(bc[379363].Hash);
+            fork.Append(bc[379364]);
+
+            Assert.True(true);
+        }
+#pragma warning restore MEN002 // Line is too long
+
         [Fact]
         public void DoesTransactionFollowsPolicyWithEmpty()
         {
