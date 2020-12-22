@@ -3,9 +3,11 @@ namespace Lib9c.Tests
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.IO;
     using System.Security.Cryptography;
     using System.Threading.Tasks;
     using Bencodex.Types;
+    using Lib9c.Tests.Action;
     using Libplanet;
     using Libplanet.Action;
     using Libplanet.Assets;
@@ -37,25 +39,58 @@ namespace Lib9c.Tests
         [Fact]
         public void Debug()
         {
-            var store = new RocksDBStore(@"C:\Users\riema\AppData\Local\planetarium\9c-main-testbed");
-            var stateStore = new TrieStateStore(
-                new RocksDBKeyValueStore(@"C:\Users\riema\AppData\Local\planetarium\9c-main-testbed\states"),
-                new RocksDBKeyValueStore(@"C:\Users\riema\AppData\Local\planetarium\9c-main-testbed\state_hashes")
+            var fooStore = new RocksDBStore(@"F:\store\06AM");
+            var fooStateStore = new TrieStateStore(
+                new RocksDBKeyValueStore(@"F:\store\06AM\states"),
+                new RocksDBKeyValueStore(@"F:\store\06AM\state_hashes")
             );
-            var genesis = store.GetBlock<PolymorphicAction<ActionBase>>(
+            var genesis = fooStore.GetBlock<PolymorphicAction<ActionBase>>(
                 new HashDigest<SHA256>(
                     ByteUtil.ParseHex("4582250d0da33b06779a8475d283d5dd210c683b9b999d74d03fac4f58fa6bce"))
             );
-            var bc = new BlockChain<PolymorphicAction<ActionBase>>(
+            var fooChain = new BlockChain<PolymorphicAction<ActionBase>>(
                 new DebugPolicy(),
-                store,
-                stateStore,
+                fooStore,
+                fooStateStore,
                 genesis,
                 new[] { new BlockPolicySource(_logger).LoggedActionRenderer }
             );
 
-            var fork = bc.Fork(bc[379363].Hash);
-            fork.Append(bc[379364]);
+            var barStore = new RocksDBStore(@"F:\store\08AM");
+            var barStateStore = new TrieStateStore(
+                new RocksDBKeyValueStore(@"F:\store\08AM\states"),
+                new RocksDBKeyValueStore(@"F:\store\08AM\state_hashes")
+            );
+            var barChain = new BlockChain<PolymorphicAction<ActionBase>>(
+                new DebugPolicy(),
+                barStore,
+                barStateStore,
+                genesis,
+                new[] { new BlockPolicySource(_logger).LoggedActionRenderer }
+            );
+
+            var seedStore = new RocksDBStore(@"F:\store\seed");
+            var seedStateStore = new TrieStateStore(
+                new RocksDBKeyValueStore(@"F:\store\seed\states"),
+                new RocksDBKeyValueStore(@"F:\store\seed\state_hashes")
+            );
+            var seedChain = new BlockChain<PolymorphicAction<ActionBase>>(
+                new DebugPolicy(),
+                seedStore,
+                seedStateStore,
+                genesis,
+                new[] { new BlockPolicySource(_logger).LoggedActionRenderer }
+            );
+
+            var b1 = fooChain[387509];
+            var b2 = fooChain[387509];
+            var b3 = seedChain[387509];
+
+            for (int i = 0; i < 10000; i++)
+            {
+                var fork = seedChain.Fork(seedChain[387508].Hash);
+                fork.Append(b2);
+            }
 
             Assert.True(true);
         }
