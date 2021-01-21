@@ -8,6 +8,7 @@ namespace Nekoyume.Action
         public static byte[] Serialize<T>(T items)
         {
             var formatter = new BinaryFormatter();
+            formatter.Binder = new ActionSerializationBinder();
             using (var stream = new MemoryStream())
             {
                 formatter.Serialize(stream, items);
@@ -18,6 +19,7 @@ namespace Nekoyume.Action
         public static T Deserialize<T>(byte[] bytes)
         {
             var formatter = new BinaryFormatter();
+            formatter.Binder = new ActionSerializationBinder();
             using (var stream = new MemoryStream(bytes)) 
             {
                 return (T)formatter.Deserialize(stream);
@@ -25,3 +27,4 @@ namespace Nekoyume.Action
         }
     }
 }
+
