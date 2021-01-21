@@ -10,18 +10,18 @@ namespace Nekoyume.Action
     {
         public override Type BindToType(string assemblyName, string typeName)
         {
-            var listOfAllowedTypeNames = Assembly
-                .GetAssembly(typeof(ActionBase))
-                .GetTypes()
-                .Where(t => t.IsSubclassOf(typeof(ActionBase)))
-                .Select(x => x.FullName)
-                .ToArray();
- 
-            if (Array.Exists(listOfAllowedTypeNames, e => e == typeName))
+            try
             {
-                return null;
+                return Assembly
+                    .GetAssembly(typeof(ActionBase))
+                    .GetTypes()
+                    .Where(t => t.IsSubclassOf(typeof(ActionBase)))
+                    .Single(t => t.FullName == typeName);
             }
-            throw new ArgumentException($"Unexpected type {typeName}", nameof(typeName));
+            catch (Exception e)
+            {
+                throw new ArgumentException($"Unexpected type {typeName}", e);
+            }
         }
     }
 }
