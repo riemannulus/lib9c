@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Libplanet.Action;
 
 namespace Nekoyume.Action
 {
@@ -15,7 +16,9 @@ namespace Nekoyume.Action
                 return Assembly
                     .GetAssembly(typeof(ActionBase))
                     .GetTypes()
-                    .Where(t => t.IsSubclassOf(typeof(ActionBase)))
+                    .Where(t => t.IsSubclassOf(typeof(ActionBase)) 
+                                || t.IsSubclassOf(typeof(ActionBase.ActionEvaluation<ActionBase>)))
+                    .Append(typeof(Guid))
                     .Single(t => t.FullName == typeName);
             }
             catch (Exception e)
