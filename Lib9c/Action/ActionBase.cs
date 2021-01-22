@@ -222,12 +222,7 @@ namespace Nekoyume.Action
 
             private static byte[] ToBytes(T action)
             {
-                var formatter = new BinaryFormatter();
-                using (var stream = new MemoryStream())
-                {
-                    formatter.Serialize(stream, action);
-                    return stream.ToArray();
-                }
+                return ByteSerializer.Serialize(action);
             }
 
             private static byte[] ToBytes(IAccountStateDelta delta, IImmutableSet<Address> updatedAddresses)
@@ -267,11 +262,7 @@ namespace Nekoyume.Action
 
             private static T FromBytes(byte[] bytes)
             {
-                var formatter = new BinaryFormatter();
-                using (var stream = new MemoryStream(bytes))
-                {
-                    return (T)formatter.Deserialize(stream);
-                }
+                return ByteSerializer.Deserialize<T>(bytes);
             }
         }
 
