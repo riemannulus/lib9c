@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using Bencodex;
 using Bencodex.Types;
 using Libplanet;
@@ -223,6 +224,7 @@ namespace Nekoyume.Action
             private static byte[] ToBytes(T action)
             {
                 var formatter = new BinaryFormatter();
+                formatter.Binder = new ActionSerializationBinder();
                 using (var stream = new MemoryStream())
                 {
                     formatter.Serialize(stream, action);
@@ -268,6 +270,7 @@ namespace Nekoyume.Action
             private static T FromBytes(byte[] bytes)
             {
                 var formatter = new BinaryFormatter();
+                formatter.Binder = new ActionSerializationBinder();
                 using (var stream = new MemoryStream(bytes))
                 {
                     return (T)formatter.Deserialize(stream);
@@ -314,6 +317,26 @@ namespace Nekoyume.Action
                 {
                     throw new PermissionDeniedException(policy, ctx.Signer);
                 }
+            }
+        }
+    }
+
+    public class ActionSerializationBinder: SerializationBinder
+    {
+        public override Type BindToType(string assemblyName, string typeName)
+        {
+            try
+            {
+                return Assembly
+                    .GetAssembly(typeof(ActionBase))
+                    .GetTypes()
+                    .Where(t => t.IsSubclassOf(typeof(ActionBase)))
+                    .Append(typeof(Guid))
+                    .Single(t => t.FullName == typeName);
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException($"Unexpected type {typeName}", e);
             }
         }
     }
