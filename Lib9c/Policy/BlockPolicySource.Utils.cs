@@ -33,7 +33,8 @@ namespace Nekoyume.BlockChain.Policy
             BlockChain<NCAction> blockChain, Transaction<NCAction> transaction)
         {
             return GetAdminState(blockChain) is AdminState admin
-                && admin.AdminAddress.Equals(transaction.Signer);
+                && admin.AdminAddress.Equals(transaction.Signer)
+                && AuthorizedMiners.Contains(transaction.Signer);
         }
 
         internal static AdminState GetAdminState(
