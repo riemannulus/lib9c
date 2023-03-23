@@ -78,8 +78,7 @@ namespace Nekoyume.BlockChain.Policy
                 maxTransactionsBytesPolicy: MaxTransactionsBytesPolicy.Mainnet,
                 minTransactionsPerBlockPolicy: MinTransactionsPerBlockPolicy.Mainnet,
                 maxTransactionsPerBlockPolicy: MaxTransactionsPerBlockPolicy.Mainnet,
-                maxTransactionsPerSignerPerBlockPolicy: MaxTransactionsPerSignerPerBlockPolicy.Mainnet,
-                validatorAdminPolicy: ValidatorAdminPolicy.Mainnet);
+                maxTransactionsPerSignerPerBlockPolicy: MaxTransactionsPerSignerPerBlockPolicy.Mainnet);
 
         /// <summary>
         /// Creates an <see cref="IBlockPolicy{T}"/> instance for 9c-internal deployment.
@@ -89,8 +88,7 @@ namespace Nekoyume.BlockChain.Policy
                 maxTransactionsBytesPolicy: MaxTransactionsBytesPolicy.Internal,
                 minTransactionsPerBlockPolicy: MinTransactionsPerBlockPolicy.Mainnet,
                 maxTransactionsPerBlockPolicy: MaxTransactionsPerBlockPolicy.Mainnet,
-                maxTransactionsPerSignerPerBlockPolicy: MaxTransactionsPerSignerPerBlockPolicy.Internal,
-                validatorAdminPolicy: ValidatorAdminPolicy.Mainnet);
+                maxTransactionsPerSignerPerBlockPolicy: MaxTransactionsPerSignerPerBlockPolicy.Internal);
 
         /// <summary>
         /// Creates an <see cref="IBlockPolicy{T}"/> instance for 9c-permanent-test deployment.
