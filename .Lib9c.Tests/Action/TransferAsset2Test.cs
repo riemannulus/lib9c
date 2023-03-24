@@ -10,6 +10,7 @@ namespace Lib9c.Tests.Action
     using Libplanet;
     using Libplanet.Action;
     using Libplanet.Assets;
+    using Libplanet.Consensus;
     using Libplanet.Crypto;
     using Nekoyume;
     using Nekoyume.Action;
@@ -44,6 +45,32 @@ namespace Lib9c.Tests.Action
         {
             Assert.Throws<MemoLengthOverflowException>(() =>
                 new TransferAsset2(_sender, _recipient, _currency * 100, new string(' ', 100)));
+        }
+
+        [Fact]
+        public void Test()
+        {
+            var balance = ImmutableDictionary<(Address, Currency), FungibleAssetValue>.Empty
+                .Add((_sender, _currency), _currency * 1000)
+                .Add((_recipient, _currency), _currency * 10);
+            var state = ImmutableDictionary<Address, IValue>.Empty
+                .Add(_recipient.Derive(ActivationKey.DeriveKey), true.Serialize());
+            var prevState = new State(
+                state: state,
+                balance: balance
+            );
+            var validator = new Validator(new PrivateKey().PublicKey, BigInteger.One);
+            var action = ValidatorSetOperate.Append(validator);
+            IAccountStateDelta nextState = action.Execute(new ActionContext()
+            {
+                PreviousStates = prevState,
+                Signer = _sender,
+                Rehearsal = false,
+                BlockIndex = 1,
+            });
+
+            Assert.Single(nextState.GetValidatorSet().Validators);
+            Assert.True(nextState.GetValidatorSet().Contains(validator));
         }
 
         [Fact]

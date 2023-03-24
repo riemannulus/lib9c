@@ -79,14 +79,12 @@ namespace Nekoyume.Action
              CheckPermission(context);
 
              IAccountStateDelta previousState = context.PreviousStates;
+             IAccountStateDelta nextState = previousState;
              ValidatorSet validatorSet = previousState.GetValidatorSet();
 
              Func<ValidatorSet, Validator, ValidatorSet> func = Operator.ToFunc();
              ValidatorSet result = func(validatorSet, Operand);
-             IEnumerable<Validator> diff = validatorSet.Validators.Except(result.Validators);
-
-             IAccountStateDelta nextState = previousState;
-             foreach (Validator validator in diff)
+             foreach (Validator validator in result.Validators)
              {
                  nextState = nextState.SetValidator(validator);
              }

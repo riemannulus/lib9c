@@ -10,12 +10,14 @@ namespace Lib9c.Tests.Action
     using Libplanet.Action;
     using Libplanet.Assets;
     using Libplanet.Consensus;
+    using Libplanet.Crypto;
 
-    public class State : IAccountStateDelta
+    public class State : IAccountStateDelta, IValidatorSupportStateDelta
     {
         private readonly IImmutableDictionary<Address, IValue> _state;
         private readonly IImmutableDictionary<(Address, Currency), FungibleAssetValue> _balance;
         private readonly IImmutableDictionary<Currency, FungibleAssetValue> _totalSupplies;
+        private readonly Address _validatorStateAddress;
 
         public State(
             IImmutableDictionary<Address, IValue> state = null,
@@ -26,6 +28,7 @@ namespace Lib9c.Tests.Action
             _balance = balance ?? ImmutableDictionary<(Address, Currency), FungibleAssetValue>.Empty;
             _totalSupplies =
                 totalSupplies ?? ImmutableDictionary<Currency, FungibleAssetValue>.Empty;
+            _validatorStateAddress = new Address("0x281cb39Fc24419eEb6E8a4D295BAC99728d0dCB6");
         }
 
         public IImmutableSet<Address> UpdatedAddresses =>
@@ -143,9 +146,22 @@ namespace Lib9c.Tests.Action
 
         public IAccountStateDelta SetValidator(Validator validator)
         {
-            return new State(_state);
+            _state.TryGetValue(_validatorStateAddress, out IValue plainValidatorSet);
+            var validatorSet = plainValidatorSet is null
+                ? new ValidatorSet()
+                : new ValidatorSet((List)plainValidatorSet);
+            validatorSet = validatorSet.Update(validator);
+            return new State(
+                _state.SetItem(_validatorStateAddress, validatorSet.Encoded),
+                _balance);
         }
 
-        public virtual ValidatorSet GetValidatorSet() => new ValidatorSet();
+        public virtual ValidatorSet GetValidatorSet()
+        {
+            _state.TryGetValue(_validatorStateAddress, out IValue plainValidatorSet);
+            return plainValidatorSet is null
+                                   ? new ValidatorSet()
+                                   : new ValidatorSet((List)plainValidatorSet);
+        }
     }
 }
