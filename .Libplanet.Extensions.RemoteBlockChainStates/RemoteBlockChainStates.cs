@@ -1,6 +1,7 @@
 using Bencodex.Types;
 using Libplanet.Action.State;
 using Libplanet.Crypto;
+using Libplanet.Store;
 using Libplanet.Types.Assets;
 using Libplanet.Types.Blocks;
 using Libplanet.Types.Consensus;
@@ -15,6 +16,10 @@ namespace Libplanet.Extensions.RemoteBlockChainStates
         {
             _explorerEndpoint = explorerEndpoint;
         }
+
+        public IStore Store => throw new NotSupportedException();
+
+        public IStateStore StateStore => throw new NotSupportedException();
 
         public IValue? GetState(Address address, BlockHash? offset) =>
             GetStates(new[] { address }, offset).First();
