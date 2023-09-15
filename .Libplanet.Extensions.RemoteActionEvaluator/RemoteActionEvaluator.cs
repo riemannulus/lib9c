@@ -27,7 +27,7 @@ public class RemoteActionEvaluator : IActionEvaluator
 
     public IActionLoader ActionLoader => throw new NotSupportedException();
 
-    public IReadOnlyList<IActionEvaluation> Evaluate(IPreEvaluationBlock block)
+    public IReadOnlyList<IActionResult> Evaluate(IPreEvaluationBlock block)
     {
         using var httpClient = new HttpClient();
         var response = httpClient.PostAsJsonAsync(_endpoint, new RemoteEvaluationRequest
@@ -56,7 +56,7 @@ public class RemoteActionEvaluator : IActionEvaluator
                 actionEvaluations[i].InputContext.PreviousState;
         }
 
-        return actionEvaluations;
+        return actionEvaluations.Select(x => new ActionResult(x)).ToArray();
     }
 
     [Pure]
