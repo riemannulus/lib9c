@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
 using System.Net.Http.Json;
+using System.Numerics;
 using Bencodex.Types;
 using Lib9c.StateService.Shared;
 using Libplanet.Action;
@@ -56,7 +57,7 @@ public class RemoteActionEvaluator : IActionEvaluator
                 actionEvaluations[i].InputContext.PreviousState;
         }
 
-        return actionEvaluations.Select(x => new ActionResult(x)).ToArray();
+        return actionEvaluations.Select(x => new ActionResult(x, ImmutableDictionary<(Address, Currency), BigInteger>.Empty)).ToArray();
     }
 
     [Pure]
