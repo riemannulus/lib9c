@@ -5,6 +5,7 @@ using Libplanet.Action;
 using Libplanet.Action.Loader;
 using Libplanet.Common;
 using Libplanet.Extensions.ActionEvaluatorCommonComponents;
+using Libplanet.RocksDBStore;
 using Libplanet.Types.Blocks;
 
 namespace Libplanet.Extensions.PluginActionEvaluator
@@ -15,9 +16,9 @@ namespace Libplanet.Extensions.PluginActionEvaluator
 
         public IActionLoader ActionLoader => throw new NotImplementedException();
 
-        public PluggedActionEvaluator(string pluginPath, string aevTypeName, string storePath)
+        public PluggedActionEvaluator(string pluginPath, string aevTypeName, RocksDBKeyValueStore keyValueStore)
         {
-            _pluginActionEvaluator = CreateActionEvaluator(pluginPath, aevTypeName, storePath);
+            _pluginActionEvaluator = CreateActionEvaluator(pluginPath, aevTypeName, keyValueStore);
         }
 
         public static Assembly LoadPlugin(string absolutePath)
@@ -26,10 +27,10 @@ namespace Libplanet.Extensions.PluginActionEvaluator
             return loadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(absolutePath)));
         }
 
-        public static IPluginActionEvaluator CreateActionEvaluator(Assembly assembly, string aevTypeName, string storePath)
+        public static IPluginActionEvaluator CreateActionEvaluator(Assembly assembly, string aevTypeName, RocksDBKeyValueStore keyValueStore)
         {
             if (assembly.GetType(aevTypeName) is Type type &&
-                Activator.CreateInstance(type, args: storePath) as IPluginActionEvaluator
+                Activator.CreateInstance(type, args: new PluginRocksDBKeyValueStore(keyValueStore)) as IPluginActionEvaluator
                 is IPluginActionEvaluator pluginActionEvaluator)
             {
                 return pluginActionEvaluator;
@@ -41,8 +42,8 @@ namespace Libplanet.Extensions.PluginActionEvaluator
         public bool HasTrie(byte[] hash)
             => _pluginActionEvaluator.HasTrie(hash);
 
-        public static IPluginActionEvaluator CreateActionEvaluator(string pluginPath, string aevTypeName, string storePath)
-            => CreateActionEvaluator(LoadPlugin(pluginPath), aevTypeName, storePath);
+        public static IPluginActionEvaluator CreateActionEvaluator(string pluginPath, string aevTypeName, RocksDBKeyValueStore keyValueStore)
+            => CreateActionEvaluator(LoadPlugin(pluginPath), aevTypeName, keyValueStore);
 
         public IReadOnlyList<ICommittedActionEvaluation> Evaluate(IPreEvaluationBlock block, HashDigest<SHA256>? baseStateRootHash)
             => _pluginActionEvaluator.Evaluate(
