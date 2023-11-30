@@ -38,6 +38,9 @@ namespace Libplanet.Extensions.PluginActionEvaluator
             throw new NullReferenceException("PluginActionEvaluator not found with given parameters");
         }
 
+        public bool HasTrie(byte[] hash)
+            => _pluginActionEvaluator.HasTrie(hash);
+
         public static IPluginActionEvaluator CreateActionEvaluator(string pluginPath, string aevTypeName, string storePath)
             => CreateActionEvaluator(LoadPlugin(pluginPath), aevTypeName, storePath);
 
