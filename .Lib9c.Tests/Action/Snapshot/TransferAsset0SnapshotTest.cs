@@ -55,7 +55,11 @@ namespace Lib9c.Tests.Action.Snapshot
             var inputTrie = stateStore.GetStateRoot(null);
             IAccount state = new Account(new AccountState(inputTrie))
                 .MintAsset(context, senderAddress, crystal * 100);
-            inputTrie = stateStore.Commit(state.Trie);
+
+            // NOTE: Temporary measure using IAccountDelta.
+            // Will be removed once Libplanet moves to ITrie based IAccouns.
+            inputTrie = inputTrie.Set(state.Delta.ToRawDelta());
+            inputTrie = stateStore.Commit(inputTrie);
             state = new Account(new AccountState(inputTrie));
 
             var actionContext = new ActionContext
@@ -69,7 +73,8 @@ namespace Lib9c.Tests.Action.Snapshot
                 crystal * 20);
 
             var outputState = action.Execute(actionContext);
-            var outputTrie = stateStore.Commit(outputState.Trie);
+            var outputTrie = inputTrie.Set(outputState.Delta.ToRawDelta());
+            outputTrie = stateStore.Commit(outputTrie);
 
             var trieDiff = outputTrie.Diff(inputTrie)
                 .Select(elem => new object[]
@@ -107,7 +112,11 @@ namespace Lib9c.Tests.Action.Snapshot
             var inputTrie = stateStore.GetStateRoot(null);
             IAccount state = new Account(new AccountState(inputTrie))
                 .MintAsset(context, senderAddress, crystal * 100);
-            inputTrie = stateStore.Commit(state.Trie);
+
+            // NOTE: Temporary measure using IAccountDelta.
+            // Will be removed once Libplanet moves to ITrie based IAccouns.
+            inputTrie = inputTrie.Set(state.Delta.ToRawDelta());
+            inputTrie = stateStore.Commit(inputTrie);
             state = new Account(new AccountState(inputTrie));
 
             var actionContext = new ActionContext
@@ -121,7 +130,8 @@ namespace Lib9c.Tests.Action.Snapshot
                 crystal * 20,
                 "MEMO");
             var outputState = action.Execute(actionContext);
-            var outputTrie = stateStore.Commit(outputState.Trie);
+            var outputTrie = inputTrie.Set(outputState.Delta.ToRawDelta());
+            outputTrie = stateStore.Commit(outputTrie);
 
             var trieDiff = outputTrie.Diff(inputTrie)
                 .Select(elem => new object[]
