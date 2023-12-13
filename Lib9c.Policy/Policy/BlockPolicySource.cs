@@ -139,7 +139,7 @@ namespace Nekoyume.Blockchain.Policy
 
             // FIXME: Slight inconsistency due to pre-existing delegate.
             return new BlockPolicy(
-                null,
+                new RewardGold(),
                 blockInterval: BlockInterval,
                 validateNextBlockTx: validateNextBlockTx,
                 validateNextBlock: validateNextBlock,
