@@ -2,7 +2,9 @@
 using Bencodex.Types;
 using Libplanet.Action;
 using Libplanet.Action.State;
+using Libplanet.Crypto;
 using Libplanet.Types.Assets;
+using Nekoyume.Action.DPoS.Util;
 using Nekoyume.Module;
 
 namespace Nekoyume.Action.DPoS.Sys
@@ -32,26 +34,32 @@ namespace Nekoyume.Action.DPoS.Sys
         /// <inheritdoc cref="IAction.Execute(IActionContext)"/>
         public override IWorld Execute(IActionContext context)
         {
-            var state = context.PreviousState;
+            IWorld state = context.PreviousState;
             if (context.MaxGasPrice is not { } realGasPrice)
             {
                 return state;
             }
 
-            var balance = state.GetBalance(context.Signer, realGasPrice.Currency);
-            if (balance < realGasPrice * context.GasLimit())
+            Address paymaster = context.Signer;
+            Address pledgeContractAddress = context.Signer.GetPledgeAddress();
+            if (state.TryGetLegacyState(pledgeContractAddress, out List contract)
+                && contract[1].ToBoolean())
             {
-                var msg =
-                    $"The account {context.Signer}'s balance of {realGasPrice.Currency} is " +
-                    "insufficient to pay gas fee: " +
-                    $"{balance} < {realGasPrice * context.GasLimit()}.";
-                throw new InsufficientBalanceException(msg, context.Signer, balance);
+                paymaster = contract[0].ToAddress();
             }
 
-            return state.BurnAsset(
-                context,
-                context.Signer,
-                realGasPrice * context.GasLimit());
+            FungibleAssetValue balance = state.GetBalance(paymaster, realGasPrice.Currency);
+            if (balance >= realGasPrice * context.GasLimit())
+                return state.BurnAsset(
+                    context,
+                    paymaster,
+                    realGasPrice * context.GasLimit());
+
+            string msg =
+                $"The account {paymaster}'s balance of {realGasPrice.Currency} is " +
+                "insufficient to pay gas fee: " +
+                $"{balance} < {realGasPrice * context.GasLimit()}.";
+            throw new InsufficientBalanceException(msg, paymaster, balance);
         }
     }
 }
