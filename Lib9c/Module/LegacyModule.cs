@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using Bencodex.Types;
+using Jitbit.Utils;
 using Lib9c;
 using Libplanet.Action;
 using Libplanet.Action.State;
@@ -29,9 +30,8 @@ namespace Nekoyume.Module
 {
     public static class LegacyModule
     {
-        private const int SheetsCacheSize = 100;
-        private static readonly LruCache<string, ISheet> SheetsCache =
-            new LruCache<string, ISheet>(SheetsCacheSize);
+        private static readonly FastCache<string, ISheet> FastSheetsCache =
+            new FastCache<string, ISheet>();
 
         public static IValue GetLegacyState(this IWorldState worldState, Address address) =>
             worldState.GetAccountState(ReservedAddresses.LegacyAccount).GetState(address);
@@ -401,14 +401,14 @@ namespace Nekoyume.Module
                 }
 
                 var cacheKey = sheetAddr.ToHex() + ByteUtil.Hex(hash);
-                if (SheetsCache.TryGetValue(cacheKey, out var cached))
+                if (FastSheetsCache.TryGet(cacheKey, out var cached))
                 {
                     return (T)cached;
                 }
 
                 var sheet = new T();
                 sheet.Set(csv);
-                SheetsCache.AddOrUpdate(cacheKey, sheet);
+                FastSheetsCache.AddOrUpdate(cacheKey, sheet, TimeSpan.FromMinutes(1));
                 return sheet;
             }
             catch (Exception e)
@@ -632,7 +632,7 @@ namespace Nekoyume.Module
                 }
 
                 var cacheKey = address.ToHex() + ByteUtil.Hex(hash);
-                if (SheetsCache.TryGetValue(cacheKey, out var cached))
+                if (FastSheetsCache.TryGet(cacheKey, out var cached))
                 {
                     result[sheetType] = (address, cached);
                     continue;
@@ -645,7 +645,7 @@ namespace Nekoyume.Module
                 }
 
                 sheet.Set(csv);
-                SheetsCache.AddOrUpdate(cacheKey, sheet);
+                FastSheetsCache.AddOrUpdate(cacheKey, sheet, TimeSpan.FromMinutes(1));
                 result[sheetType] = (address, sheet);
             }
 
