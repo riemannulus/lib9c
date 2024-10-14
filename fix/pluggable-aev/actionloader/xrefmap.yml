@@ -85021,12 +85021,12 @@ references:
   commentId: F:Nekoyume.TableData.WorldBossRankingRewardSheet.Row.Crystal
   fullName: Nekoyume.TableData.WorldBossRankingRewardSheet.Row.Crystal
   nameWithType: WorldBossRankingRewardSheet.Row.Crystal
-- uid: Nekoyume.TableData.WorldBossRankingRewardSheet.Row.GetRewards(Nekoyume.TableData.RuneSheet)
-  name: GetRewards(RuneSheet)
-  href: api/Nekoyume.TableData.WorldBossRankingRewardSheet.Row.html#Nekoyume_TableData_WorldBossRankingRewardSheet_Row_GetRewards_Nekoyume_TableData_RuneSheet_
-  commentId: M:Nekoyume.TableData.WorldBossRankingRewardSheet.Row.GetRewards(Nekoyume.TableData.RuneSheet)
-  fullName: Nekoyume.TableData.WorldBossRankingRewardSheet.Row.GetRewards(Nekoyume.TableData.RuneSheet)
-  nameWithType: WorldBossRankingRewardSheet.Row.GetRewards(RuneSheet)
+- uid: Nekoyume.TableData.WorldBossRankingRewardSheet.Row.GetRewards(Nekoyume.TableData.RuneSheet,Nekoyume.TableData.MaterialItemSheet)
+  name: GetRewards(RuneSheet, MaterialItemSheet)
+  href: api/Nekoyume.TableData.WorldBossRankingRewardSheet.Row.html#Nekoyume_TableData_WorldBossRankingRewardSheet_Row_GetRewards_Nekoyume_TableData_RuneSheet_Nekoyume_TableData_MaterialItemSheet_
+  commentId: M:Nekoyume.TableData.WorldBossRankingRewardSheet.Row.GetRewards(Nekoyume.TableData.RuneSheet,Nekoyume.TableData.MaterialItemSheet)
+  fullName: Nekoyume.TableData.WorldBossRankingRewardSheet.Row.GetRewards(Nekoyume.TableData.RuneSheet, Nekoyume.TableData.MaterialItemSheet)
+  nameWithType: WorldBossRankingRewardSheet.Row.GetRewards(RuneSheet, MaterialItemSheet)
 - uid: Nekoyume.TableData.WorldBossRankingRewardSheet.Row.GetRewards*
   name: GetRewards
   href: api/Nekoyume.TableData.WorldBossRankingRewardSheet.Row.html#Nekoyume_TableData_WorldBossRankingRewardSheet_Row_GetRewards_
@@ -85053,6 +85053,12 @@ references:
   isSpec: "True"
   fullName: Nekoyume.TableData.WorldBossRankingRewardSheet.Row.Key
   nameWithType: WorldBossRankingRewardSheet.Row.Key
+- uid: Nekoyume.TableData.WorldBossRankingRewardSheet.Row.Materials
+  name: Materials
+  href: api/Nekoyume.TableData.WorldBossRankingRewardSheet.Row.html#Nekoyume_TableData_WorldBossRankingRewardSheet_Row_Materials
+  commentId: F:Nekoyume.TableData.WorldBossRankingRewardSheet.Row.Materials
+  fullName: Nekoyume.TableData.WorldBossRankingRewardSheet.Row.Materials
+  nameWithType: WorldBossRankingRewardSheet.Row.Materials
 - uid: Nekoyume.TableData.WorldBossRankingRewardSheet.Row.RankingMax
   name: RankingMax
   href: api/Nekoyume.TableData.WorldBossRankingRewardSheet.Row.html#Nekoyume_TableData_WorldBossRankingRewardSheet_Row_RankingMax
